@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var ALL_COMMENTS = ['Всё отлично!',
   'В целом всё неплохо. Но не всё',
@@ -34,7 +34,7 @@ for (var i = 0; i < 25; i++) {
     likes: getRandomInt(15, 200),
     comments: [ALL_COMMENTS[getRandomInt(0, ALL_COMMENTS.length - 1)], ALL_COMMENTS[getRandomInt(0, ALL_COMMENTS.length - 1)]],
     description: DESCRIPTIONS[getRandomInt(0, DESCRIPTIONS.length - 1)]
-  }
+  };
 
   pictures[i] = picture;
 }
