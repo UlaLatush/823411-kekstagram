@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars,semi */
+'use strict'
 
 var ALL_COMMENTS = ['Всё отлично!',
   'В целом всё неплохо. Но не всё',
