@@ -1,82 +1,125 @@
 'use strict';
 
-var ALL_COMMENTS = ['Всё отлично!',
+var ALL_COMMENTS = [
+  'Всё отлично!',
   'В целом всё неплохо. Но не всё',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
   'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
-  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
+  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+];
 
-var DESCRIPTIONS = ['Тестим новую камеру!',
+var DESCRIPTIONS = [
+  'Тестим новую камеру!',
   'Затусили с друзьями на море',
   'Как же круто тут кормят',
   'Отдыхаем...',
   'Цените каждое мгновенье. Цените тех, кто рядом с вами и отгоняйте все сомненья. Не обижайте всех словами......',
-  'Вот это тачка!'];
+  'Вот это тачка!'
+];
 
-var COMMENTS_HTML = '<li class="social__comment">' +
-  '<img class="social__picture" src="img/avatar-{{a}}.svg" alt="Аватар комментатора фотографии" width="35" height="35">' +
-  '<p class="social__text">{{b}}</p>' +
-  '</li>';
+var LIKES_MIN = 15;
+
+var LIKES_MAX = 200;
+
+var NAMES = [
+  'Снеки',
+  'Валера',
+  'Маша',
+  'Кира',
+  'Юля'
+];
 
 var pictures = [];
 
 function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(min + Math.random() * (max + 1 - min));
 }
 
-for (var i = 0; i < 25; i++) {
-
-  var picture = {
+function getPhotoObject(i) {
+  return {
     url: 'photos/' + (i + 1) + '.jpg',
-    likes: getRandomInt(15, 200),
-    comments: [ALL_COMMENTS[getRandomInt(0, ALL_COMMENTS.length - 1)], ALL_COMMENTS[getRandomInt(0, ALL_COMMENTS.length - 1)]],
+    likes: getRandomInt(LIKES_MIN, LIKES_MAX),
+    comments: getRandomComments(),
     description: DESCRIPTIONS[getRandomInt(0, DESCRIPTIONS.length - 1)]
   };
+}
 
-  pictures[i] = picture;
+function createPhotoElement(photoIndex) {
+  var instance = fragment.cloneNode(true);
+  var img = instance.querySelector('img');
+  img.setAttribute('src', pictures[photoIndex].url);
+  img.setAttribute('alt', pictures[photoIndex].description);
+  instance.querySelector('.picture__comments').textContent = pictures[photoIndex].comments.length;
+  instance.querySelector('.picture__likes').textContent = pictures[photoIndex].likes;
+  return instance;
+}
+
+function createCommentElement(commentIndex) {
+  var instance = commentTemplate.cloneNode(true);
+  instance.querySelector('img').setAttribute('src', randomComments[commentIndex].avatar);
+  instance.querySelector('p').textContent = randomComments[commentIndex].message;
+  return instance;
+}
+
+function getRandomComments() {
+  var randomComments = [];
+  var amountComments = getRandomInt(1, ALL_COMMENTS.length);
+  var allCommentsClone = ALL_COMMENTS.slice(0);
+  for (var i = 1; i <= amountComments; i++) {
+    var randomCommentIndex = getRandomInt(0, allCommentsClone.length - 1);
+    var comment = {
+      avatar: 'img/avatar-' + getRandomInt(1, 6) + '.svg',
+      message: allCommentsClone[randomCommentIndex],
+      name: NAMES[getRandomInt(0, NAMES.length - 1)]
+    };
+    allCommentsClone.splice(randomCommentIndex, 1);
+    randomComments.push(comment);
+  }
+
+  return randomComments;
+}
+
+// generate photo objects
+for (var i = 0; i < 25; i++) {
+  pictures.push(getPhotoObject(i));
 }
 
 // obtain picture template
-var fragment = document.getElementById('picture').content;
+var fragment = document.querySelector('#picture').content;
 
 // find initial position
-var sectionPictures = document.getElementsByClassName('pictures').item(0);
-var sectionPictureUpload = sectionPictures.getElementsByClassName('img-upload').item(0);
+var sectionPictures = document.querySelector('.pictures');
+var sectionPictureUpload = sectionPictures.querySelector('.img-upload');
 
-// generate pictures
+// add photo elements to page
+var fragmentPics = document.createDocumentFragment();
 for (var j = 0; j < pictures.length; j++) {
-
-  // create instance
-  var instance = fragment.cloneNode(true);
-  var img = instance.querySelector('img');
-  img.setAttribute('src', pictures[j].url);
-  img.setAttribute('alt', pictures[j].description);
-
-  var spanComments = instance.querySelector('.picture__comments');
-  spanComments.innerHTML = pictures[j].comments.length;
-
-  var spanLikes = instance.querySelector('.picture__likes');
-  spanLikes.innerHTML = pictures[j].likes;
-
-  sectionPictures.insertBefore(instance, sectionPictureUpload);
+  fragmentPics.appendChild(createPhotoElement(j));
 }
+sectionPictures.insertBefore(fragmentPics, sectionPictureUpload);
 
 // open big picture
 var bigPicture = document.querySelector('.big-picture');
 var firstPicture = pictures[0];
 bigPicture.classList.remove('hidden');
 
-bigPicture.querySelector('.big-picture__img').setAttribute('src', firstPicture.url);
-bigPicture.querySelector('.likes-count').innerText = firstPicture.likes;
-bigPicture.querySelector('.comments-count').innerText = firstPicture.comments.length;
-bigPicture.querySelector('.social__caption').innerText = firstPicture.description;
+// fill likes, comments amount and description
+bigPicture.querySelector('.big-picture__img').children[0].setAttribute('src', firstPicture.url);
+bigPicture.querySelector('.likes-count').textContent = firstPicture.likes;
+bigPicture.querySelector('.comments-count').textContent = firstPicture.comments.length;
+bigPicture.querySelector('.social__caption').textContent = firstPicture.description;
 
-bigPicture.querySelector('.social__comments').innerHTML
-  = COMMENTS_HTML.replace('{{a}}', getRandomInt(1, 6)).replace('{{b}}', firstPicture.comments[0])
-  + COMMENTS_HTML.replace('{{a}}', getRandomInt(1, 6)).replace('{{b}}', firstPicture.comments[1]);
+// add comment elements to page
+var commentsContainer = bigPicture.querySelector('.social__comments');
+var commentTemplate = commentsContainer.children[0];
+var commentsFragment = document.createDocumentFragment();
+var randomComments = getRandomComments();
+for (var c = 0; c < randomComments.length; c++) {
+  commentsFragment.appendChild(createCommentElement(c));
+}
+commentsContainer.innerHTML = '';
+commentsContainer.appendChild(commentsFragment);
 
 // hide blocks
 bigPicture.querySelector('.social__comment-count').classList.add('visually-hidden');
