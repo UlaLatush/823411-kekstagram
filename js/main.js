@@ -22,6 +22,8 @@ var LIKES_MIN = 15;
 
 var LIKES_MAX = 200;
 
+var PHOTOS_AMOUNT = 25;
+
 var NAMES = [
   'Снеки',
   'Валера',
@@ -55,18 +57,19 @@ function createPhotoElement(photoIndex) {
   return instance;
 }
 
-function createCommentElement(commentIndex) {
+function createCommentElement(comment) {
   var instance = commentTemplate.cloneNode(true);
-  instance.querySelector('img').setAttribute('src', randomComments[commentIndex].avatar);
-  instance.querySelector('p').textContent = randomComments[commentIndex].message;
+  instance.querySelector('img').setAttribute('src', comment.avatar);
+  instance.querySelector('p').textContent = comment.message;
+  instance.querySelector('img').setAttribute('alt', comment.name);
   return instance;
 }
 
 function getRandomComments() {
   var randomComments = [];
-  var amountComments = getRandomInt(1, ALL_COMMENTS.length);
+  var randomAmountComments = getRandomInt(1, ALL_COMMENTS.length);
   var allCommentsClone = ALL_COMMENTS.slice(0);
-  for (var i = 1; i <= amountComments; i++) {
+  for (var i = 1; i <= randomAmountComments; i++) {
     var randomCommentIndex = getRandomInt(0, allCommentsClone.length - 1);
     var comment = {
       avatar: 'img/avatar-' + getRandomInt(1, 6) + '.svg',
@@ -81,7 +84,7 @@ function getRandomComments() {
 }
 
 // generate photo objects
-for (var i = 0; i < 25; i++) {
+for (var i = 0; i < PHOTOS_AMOUNT; i++) {
   pictures.push(getPhotoObject(i));
 }
 
@@ -114,9 +117,9 @@ bigPicture.querySelector('.social__caption').textContent = firstPicture.descript
 var commentsContainer = bigPicture.querySelector('.social__comments');
 var commentTemplate = commentsContainer.children[0];
 var commentsFragment = document.createDocumentFragment();
-var randomComments = getRandomComments();
-for (var c = 0; c < randomComments.length; c++) {
-  commentsFragment.appendChild(createCommentElement(c));
+
+for (var c = 0; c < firstPicture.comments.length; c++) {
+  commentsFragment.appendChild(createCommentElement(firstPicture.comments[c]));
 }
 commentsContainer.innerHTML = '';
 commentsContainer.appendChild(commentsFragment);
