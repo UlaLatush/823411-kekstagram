@@ -103,7 +103,7 @@ for (var j = 0; j < pictures.length; j++) {
 sectionPictures.insertBefore(fragmentPics, sectionPictureUpload);
 
 // open big picture
-function openBigPicture() {
+/* function openBigPicture() {
   var bigPicture = document.querySelector('.big-picture');
   var firstPicture = pictures[0];
   bigPicture.classList.remove('hidden');
@@ -128,7 +128,7 @@ function openBigPicture() {
   // hide blocks
   bigPicture.querySelector('.social__comment-count').classList.add('visually-hidden');
   bigPicture.querySelector('.comments-loader').classList.add('visually-hidden');
-}
+}*/
 
 var openPhotoEditor = function () {
   document.querySelector('.img-upload__overlay').classList.remove('hidden');
