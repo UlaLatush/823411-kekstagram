@@ -182,8 +182,10 @@ var openPhotoEditor = function () {
 document.querySelector('#upload-file').addEventListener('change', openPhotoEditor);
 
 var closePhotoEditor = function () {
-  if (!document.activeElement.classList.contains('text__description')
-  && !document.activeElement.classList.contains('text__hashtags')) {
+  if (
+    !document.activeElement.classList.contains('text__description')
+    && !document.activeElement.classList.contains('text__hashtags')
+  ) {
     document.querySelector('.img-upload__overlay').classList.add('hidden');
     document.querySelector('#upload-file').value = null;
     document.querySelector('.text__hashtags').value = null;
