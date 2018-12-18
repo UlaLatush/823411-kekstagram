@@ -203,13 +203,76 @@ document.addEventListener('keydown', function (event) {
   }
 });
 
+// drag pin
+var pin = document.querySelector('.effect-level__pin');
+pin.addEventListener('mousedown', function (event) {
+  event.preventDefault();
+
+  var startX = event.clientX;
+
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shiftX = startX - moveEvt.clientX;
+    startX = moveEvt.clientX;
+
+    pin.style.left = (pin.offsetLeft - shiftX) + 'px';
+  };
+
+  var changeEffect = function (effectLevel) {
+
+    var imgPreview = document.querySelector('.img-upload__preview');
+    var selectedEffect = document.querySelector('input[name="effect"]:checked').value;
+
+    if (selectedEffect === 'chrome') {
+      imgPreview.setAttribute('style', 'filter: grayscale(' + effectLevel / 100 + ');');
+      // filter: grayscale(0..1)
+    } else if (selectedEffect === 'sepia') {
+      imgPreview.setAttribute('style', 'filter: sepia(' + effectLevel / 100 + ');');
+      // filter: sepia(0..1)
+    } else if (selectedEffect === 'marvin') {
+      imgPreview.setAttribute('style', 'filter: invert(' + effectLevel + '%);');
+      // filter: invert(0..100%)
+    } else if (selectedEffect === 'phobos') {
+      imgPreview.setAttribute('style', 'filter: blur(' + Math.trunc(effectLevel / 100 * 3) + 'px);');
+      // filter: blur(0..3px)
+    } else if (selectedEffect === 'heat') {
+      var truncatedVal = Math.trunc(effectLevel / 100 * 3);
+      imgPreview.setAttribute('style', 'filter: brightness(' + truncatedVal === 0 ? 1 : truncatedVal + 'px);');
+      // filter: brightness(1..3)
+    }
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    var sliderWidth = pin.parentElement.offsetWidth;
+    console.log('sliderWidth = ' + sliderWidth);
+
+    var effectLevel = Math.round(pin.offsetLeft * 100 / sliderWidth);
+    console.log('effectLevel = ' + effectLevel);
+    document.querySelector('.effect-level__value').value = effectLevel;
+
+    changeEffect(effectLevel);
+
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
+
+
 // change effect opacity when release mouse from pin
-var changeFilterOpacity = function () {
-  var sliderPin = document.querySelector('.effect-level__pin');
-  var sliderWidth = sliderPin.parentElement.offsetWidth;
-  document.querySelector('.effect-level__value').value = Math.round(sliderPin.offsetLeft * 100 / sliderWidth);
-};
-document.querySelector('.effect-level__pin').addEventListener('mouseup', changeFilterOpacity);
+// var changeFilterOpacity = function () {
+//  var sliderPin = document.querySelector('.effect-level__pin');
+//  var sliderWidth = sliderPin.parentElement.offsetWidth;
+//  document.querySelector('.effect-level__value').value = Math.round(sliderPin.offsetLeft * 100 / sliderWidth);
+// };
+// document.querySelector('.effect-level__pin').addEventListener('mouseup', changeFilterOpacity);
 
 // change style of editing picture
 var changePictureStyle = function (style) {
@@ -219,7 +282,7 @@ var changePictureStyle = function (style) {
       classes.remove(classes.item(c));
     }
   }
-  classes.add('effects__preview--' + style);
+  classes.add(FILTER_STYLE_PREFIX + style);
 
   if (style === FILTER_DEFAULT) {
     document.querySelector('.img-upload__effect-level').classList.add('visually-hidden');
