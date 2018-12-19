@@ -204,33 +204,33 @@ var closePhotoEditor = function () {
 document.querySelector('#upload-cancel').addEventListener('click', closePhotoEditor);
 
 // close editor when ESC key is pressed
-document.addEventListener('keydown', function (event) {
-  if (event.which === ESC_KEY_CODE) {
+document.addEventListener('keydown', function (evt) {
+  if (evt.which === ESC_KEY_CODE) {
     closePhotoEditor();
   }
 });
 
 // drag pin
 var pin = document.querySelector('.effect-level__pin');
-pin.addEventListener('mousedown', function (event) {
-  event.preventDefault();
+pin.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
 
-  var startX = event.clientX;
+  var startX = evt.clientX;
 
 
-  var onMouseMove = function (moveEvt) {
-    moveEvt.preventDefault();
+  var onMouseMove = function (evt) {
+    evt.preventDefault();
 
-    var shiftX = startX - moveEvt.clientX;
+    var shiftX = startX - evt.clientX;
     var pinPosition = (pin.offsetLeft - shiftX);
 
     changePinPosition(pinPosition);
 
-    startX = moveEvt.clientX;
+    startX = evt.clientX;
   };
 
-  var onMouseUp = function (upEvt) {
-    upEvt.preventDefault();
+  var onMouseUp = function (evt) {
+    evt.preventDefault();
 
 
     changeFilterOpacity();
@@ -319,9 +319,9 @@ for (var k = 0; k < radios.length; k++) {
 }
 
 // open big picture
-document.addEventListener('click', function (event) {
-  if (event.srcElement.classList.contains('picture__img')) {
-    openBigPicture(findPictureByUrl(event.srcElement.src));
+document.addEventListener('click', function (evt) {
+  if (evt.srcElement.classList.contains('picture__img')) {
+    openBigPicture(findPictureByUrl(evt.srcElement.src));
   }
 });
 
