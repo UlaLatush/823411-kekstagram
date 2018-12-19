@@ -218,19 +218,19 @@ pin.addEventListener('mousedown', function (evt) {
   var startX = evt.clientX;
 
 
-  var onMouseMove = function (evt) {
-    evt.preventDefault();
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
 
-    var shiftX = startX - evt.clientX;
+    var shiftX = startX - moveEvt.clientX;
     var pinPosition = (pin.offsetLeft - shiftX);
 
     changePinPosition(pinPosition);
 
-    startX = evt.clientX;
+    startX = moveEvt.clientX;
   };
 
-  var onMouseUp = function (evt) {
-    evt.preventDefault();
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
 
 
     changeFilterOpacity();
