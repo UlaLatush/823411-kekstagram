@@ -173,7 +173,14 @@ var openPhotoEditor = function () {
   resizePicture(SCALE_DEFAULT);
 
   // set default filter
-  changePictureStyle(FILTER_DEFAULT);
+  document.querySelector('#effect-none').checked = true;
+  changePictureStyle();
+
+  // change pin position and set default filter opacity value
+  changePinPosition(Number.MAX_SAFE_INTEGER);
+
+  // set filter opacity
+  changeFilterOpacity();
 
   document.querySelector('.img-upload__overlay').classList.remove('hidden');
 };
@@ -203,38 +210,115 @@ document.addEventListener('keydown', function (event) {
   }
 });
 
-// change effect opacity when release mouse from pin
-var changeFilterOpacity = function () {
-  var sliderPin = document.querySelector('.effect-level__pin');
-  var sliderWidth = sliderPin.parentElement.offsetWidth;
-  document.querySelector('.effect-level__value').value = Math.round(sliderPin.offsetLeft * 100 / sliderWidth);
+// drag pin
+var pin = document.querySelector('.effect-level__pin');
+pin.addEventListener('mousedown', function (event) {
+  event.preventDefault();
+
+  var startX = event.clientX;
+
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shiftX = startX - moveEvt.clientX;
+    var pinPosition = (pin.offsetLeft - shiftX);
+
+    changePinPosition(pinPosition);
+
+    startX = moveEvt.clientX;
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+
+    changeFilterOpacity();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+});
+
+var changePinPosition = function (pinPosition) {
+
+  var sliderWidth = pin.parentElement.offsetWidth;
+
+  if (pinPosition > sliderWidth) {
+    pinPosition = sliderWidth;
+  } else if (pinPosition < 0) {
+    pinPosition = 0;
+  }
+
+  pin.style.left = pinPosition + 'px';
+  var effectLevel = Math.round(pin.offsetLeft * 100 / sliderWidth);
+  document.querySelector('.effect-level__value').value = effectLevel;
+  document.querySelector('.effect-level__depth').style.width = effectLevel + '%';
 };
-document.querySelector('.effect-level__pin').addEventListener('mouseup', changeFilterOpacity);
 
 // change style of editing picture
-var changePictureStyle = function (style) {
+var changePictureStyle = function () {
+
   var classes = document.querySelector('.img-upload__preview').classList;
+  var selectedEffect = document.querySelector('input[name="effect"]:checked').value;
+
   for (var c = 0; c < classes.length; c++) {
     if (classes.item(c).startsWith(FILTER_STYLE_PREFIX)) {
       classes.remove(classes.item(c));
     }
   }
-  classes.add('effects__preview--' + style);
+  classes.add(FILTER_STYLE_PREFIX + selectedEffect);
 
-  if (style === FILTER_DEFAULT) {
+  if (selectedEffect === FILTER_DEFAULT) {
     document.querySelector('.img-upload__effect-level').classList.add('visually-hidden');
   } else {
     document.querySelector('.img-upload__effect-level').classList.remove('visually-hidden');
   }
 };
+
+// change filter opacity
+var changeFilterOpacity = function () {
+
+  var imgPreview = document.querySelector('.img-upload__preview');
+  var selectedEffect = document.querySelector('input[name="effect"]:checked').value;
+  var effectLevel = document.querySelector('.effect-level__value').value;
+
+  if (selectedEffect === 'chrome') {
+    imgPreview.style.filter = 'grayscale(' + effectLevel / 100 + ')';
+  } else if (selectedEffect === 'sepia') {
+    imgPreview.style.filter = 'sepia(' + effectLevel / 100 + ')';
+  } else if (selectedEffect === 'marvin') {
+    imgPreview.style.filter = 'invert(' + effectLevel + '%)';
+  } else if (selectedEffect === 'phobos') {
+    imgPreview.style.filter = 'blur(' + Math.trunc(effectLevel / 100 * 3) + 'px)';
+  } else if (selectedEffect === 'heat') {
+    var truncatedVal = Math.trunc(effectLevel / 100 * 3);
+    imgPreview.style.filter = 'brightness(' + (truncatedVal === 0 ? 1 : truncatedVal) + ')';
+  } else {
+    imgPreview.style.filter = 'none';
+  }
+};
+
+// add listeners to switch filters
 var radios = document.querySelectorAll('.effects__radio');
 for (var k = 0; k < radios.length; k++) {
-  radios[k].addEventListener('change', function (event) {
-    changePictureStyle(event.srcElement.value);
+  radios[k].addEventListener('change', function () {
+
+    // change filter
+    changePictureStyle();
+
+    // change pin position and set default filter opacity value
+    changePinPosition(Number.MAX_SAFE_INTEGER);
+
+    // set default filter opacity
+    changeFilterOpacity();
   });
 }
 
-// open big pictute
+// open big picture
 document.addEventListener('click', function (event) {
   if (event.srcElement.classList.contains('picture__img')) {
     openBigPicture(findPictureByUrl(event.srcElement.src));
@@ -271,7 +355,7 @@ var scalePicture = function (direction) {
 
 var resizePicture = function (scale) {
   document.querySelector('.scale__control--value').value = scale + '%';
-  document.querySelector('.img-upload__preview').setAttribute('style', 'transform: scale(' + scale / 100 + ');');
+  document.querySelector('.img-upload__preview').style.transform = 'scale(' + scale / 100 + ')';
 };
 
 var validateTags = function (tags) {
