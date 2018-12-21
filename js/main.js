@@ -9,7 +9,7 @@ var fragmentPics = document.createDocumentFragment();
 
 for (var j = 0; j < window.photoData.length; j++) {
   var picture = window.photoData[j];
-  var pictureElement = window.photoUtis.createPictureElement(picture);
+  var pictureElement = window.photoUtils.createPictureElement(picture);
   fragmentPics.appendChild(pictureElement);
 }
 sectionPictures.insertBefore(fragmentPics, sectionPictureUpload);

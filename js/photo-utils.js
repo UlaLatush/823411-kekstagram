@@ -5,7 +5,7 @@
   // obtain picture template
   var pictureTemplate = document.querySelector('#picture').content;
 
-  window.photoUtis = {
+  window.photoUtils = {
     createPictureElement: function (pictute) {
       var instance = pictureTemplate.cloneNode(true);
       var img = instance.querySelector('img');
