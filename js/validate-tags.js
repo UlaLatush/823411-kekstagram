@@ -40,7 +40,7 @@
       }
     }
 
-    if (errors.length === 0 && tags.length > TAG_MAX_AMOUNT) {
+    if (errors.length === 0 && arr.length > TAG_MAX_AMOUNT) {
       errors = errors.concat(TAG_AMOUNT_IS_TOO_MUCH);
     }
 

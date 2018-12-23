@@ -14,6 +14,11 @@
   var FILTER_STYLE_PREFIX = 'effects__preview--';
   var FILTER_DEFAULT = 'none';
 
+  var COMMENT_MAX_LEN = 140;
+  var COMMENT_MAX_LEN_MSG = 'This comment is to long!';
+
+  var INCORRECT_INPUT_BORDER_COLOR = '#FF0000';
+
   var closePhotoEditor = function () {
     if (
       !document.activeElement.classList.contains('text__description')
@@ -194,11 +199,48 @@
     document.addEventListener('mouseup', onMouseUp);
   });
 
+  var onSuccess = function () {
+    closePhotoEditor();
+    window.messages.success();
+  };
+
+  var onError = function (msg) {
+    closePhotoEditor();
+    window.messages.error(msg);
+  };
+
+  var validateTags = function () {
+    var tagsInput = document.querySelector('.text__hashtags');
+    var tagsErrors = window.validateTags(tagsInput.value);
+    tagsInput.setCustomValidity(tagsErrors);
+    tagsInput.style.borderColor = INCORRECT_INPUT_BORDER_COLOR;
+    return tagsErrors.length === 0;
+  };
+
+  var validateComment = function () {
+    var commentInput = document.querySelector('.text__description');
+    var commentErrors = commentInput.value.length > COMMENT_MAX_LEN ? COMMENT_MAX_LEN_MSG : '';
+    commentInput.setCustomValidity(commentErrors);
+    commentInput.style.borderColor = INCORRECT_INPUT_BORDER_COLOR;
+    return commentErrors.length === 0;
+  };
+
   // add validator to submit button
   document.querySelector('#upload-submit').addEventListener('click', function () {
 
     var tagsInput = document.querySelector('.text__hashtags');
-    tagsInput.setCustomValidity(window.validateTags(tagsInput.value));
+    var tagsErrors = window.validateTags(tagsInput.value);
+    tagsInput.setCustomValidity(tagsErrors);
+    tagsInput.style.borderColor = INCORRECT_INPUT_BORDER_COLOR;
+
+    if (validateTags() && validateComment()) {
+      window.backend.post(onSuccess, onError,
+          new FormData(document.querySelector('#upload-select-image')));
+    }
+  });
+
+  document.querySelector('#upload-select-image').addEventListener('submit', function (evt) {
+    evt.preventDefault();
   });
 
 })();

@@ -12,9 +12,9 @@
 
   function findPictureByUrl(url) {
 
-    for (var i = 0; i < window.photoData.length; i++) {
-      if (url.includes(window.photoData[i].url)) {
-        return window.photoData[i];
+    for (var i = 0; i < window.photoLoader.photoData.length; i++) {
+      if (url.includes(window.photoLoader.photoData[i].url)) {
+        return window.photoLoader.photoData[i];
       }
     }
     return null;
